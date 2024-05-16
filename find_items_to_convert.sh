@@ -2,7 +2,6 @@
 
 find ./ -type f -name '*.wmv'
 find ./ -type f -name '*.iso'
-find ./ -type f -name '*.wmv'
 find ./ -type f -name '*.VOB'
 
 echo "Files larger than 4G"

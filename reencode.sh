@@ -11,6 +11,6 @@ if [ -f "$file" ] ; then
     if [ "$ext" = "mkv" ] ; then
         ofile="${base}-recoded.mkv"
     fi
-    echo ffmpeg -loglevel error -stats -i $file -b:v ${VBPS} -b:a ${ABPS} $ofile
-    ffmpeg -loglevel error -stats -i $file -b:v ${VBPS} -b:a ${ABPS} $ofile
+    echo ffmpeg -loglevel error -stats -i $file -map 0 -c:s copy -b:v ${VBPS} -b:a ${ABPS} $ofile
+    ffmpeg -loglevel error -stats -i "$file" -map 0 -c:s copy -b:v ${VBPS} -b:a ${ABPS} "$ofile"
 fi
