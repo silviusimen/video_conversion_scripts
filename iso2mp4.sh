@@ -3,6 +3,8 @@
 
 INFILE="$1"
 WORKDIR=$(realpath ~/Videos/_convert)
+# FFMPEG=~/bin/ffmpeg
+FFMPEG=ffmpeg
 
 if [ ! -f "$INFILE" ] ; then
     echo "input file not specified, exiting"
@@ -20,11 +22,11 @@ if mountpoint $WORKDIR/isomount/ ; then
 fi
 
 rm -f $WORKDIR/outfilelist.txt
+rm -f $WORKDIR/VTS*.mp4
 
 sudo mount -o loop "$INFILE" $WORKDIR/isomount/
 
 basefilename="${INFILE%.*}"
-
 
 pushd $WORKDIR/isomount/VIDEO_TS/
 
@@ -34,7 +36,7 @@ for vob in *.VOB ; do
         ofile="$WORKDIR/${vob%.VOB}.mp4"
         if [ ! -f $ofile ] ; then
             echo "file '$ofile'" >> $WORKDIR/outfilelist.txt
-            ffmpeg -loglevel error -stats -i $vob -b:v 900k -b:a 128k $ofile
+            $FFMPEG -loglevel error -stats -i $vob -b:v 900k -b:a 128k $ofile
         else
             echo "Skipping $vob since $ofile is already present"
         fi
@@ -43,7 +45,7 @@ for vob in *.VOB ; do
     fi
 done
 
-ffmpeg -loglevel error -stats -f concat -safe 0 -i $WORKDIR/outfilelist.txt -c copy $WORKDIR/$basefilename.mp4
+$FFMPEG -loglevel error -stats -f concat -safe 0 -i $WORKDIR/outfilelist.txt -c copy "$WORKDIR/$basefilename.mp4"
 
 popd
 
