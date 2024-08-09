@@ -16,7 +16,7 @@ if [ ! -d $WORKDIR/isomount/ ] ; then
     mkdir -p $WORKDIR/isomount/
 fi
 
-if mountpoint $WORKDIR/isomount/ ; then
+if mountpoint $WORKDIR/isomount/ > /dev/null ; then
     echo "umounting $WORKDIR/isomount/"
     sudo umount -f $WORKDIR/isomount/
 fi
@@ -36,7 +36,7 @@ for vob in *.VOB ; do
         ofile="$WORKDIR/${vob%.VOB}.mp4"
         if [ ! -f $ofile ] ; then
             echo "file '$ofile'" >> $WORKDIR/outfilelist.txt
-            $FFMPEG -loglevel error -stats -i $vob -b:v 900k -b:a 128k $ofile
+            nice $FFMPEG -loglevel error -stats -i $vob -b:v 900k -b:a 128k "$ofile"
         else
             echo "Skipping $vob since $ofile is already present"
         fi
@@ -45,8 +45,12 @@ for vob in *.VOB ; do
     fi
 done
 
-$FFMPEG -loglevel error -stats -f concat -safe 0 -i $WORKDIR/outfilelist.txt -c copy "$WORKDIR/$basefilename.mp4"
+nice $FFMPEG -loglevel error -stats -f concat -safe 0 -i $WORKDIR/outfilelist.txt -c copy "$WORKDIR/$basefilename.mp4"
 
 popd
 
 sudo umount $WORKDIR/isomount/
+
+INFILE_FULL_PATH="$(realpath $INFILE)"
+DEST_DIR=$(dirname "$INFILE_FULL_PATH")
+mv "$WORKDIR/$basefilename.mp4" "$DEST_DIR"
